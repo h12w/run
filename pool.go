@@ -11,11 +11,6 @@ import (
 // a task to be dispatched
 var ErrDispatchTimeout = errors.New("failed to dispatch the goroutine due to timeout")
 
-// Pool is an interface for a goroutine pool
-type Pool interface {
-	Go(ctx context.Context, fn func()) error
-}
-
 // dummyPool provides a dummy implementation satisifying the Pool interface
 type dummyPool struct{}
 
@@ -38,7 +33,7 @@ type GoroutinePool struct {
 }
 
 // PoolOption is used to specify an option for GoroutinePool
-type PoolOption func(p *GoroutinePool)
+type PoolOption func(*GoroutinePool)
 
 // IdleTime returns the option to specify the idle time before a goroutine exits
 // and releases the resource if no task is submitted, if not specified, the
@@ -60,8 +55,8 @@ func Max(n int) PoolOption {
 	}
 }
 
-// NewPool creates a new GoroutinePool based on the options provided
-func NewPool(options ...PoolOption) *GoroutinePool {
+// NewGoroutinePool creates a new GoroutinePool based on the options provided
+func NewGoroutinePool(options ...PoolOption) *GoroutinePool {
 	p := &GoroutinePool{
 		fnChan:   make(chan func()),
 		quitChan: make(chan struct{}),

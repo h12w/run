@@ -3,13 +3,19 @@ h12.io/run: graceful goroutine orchestration
 
 ### Overview
 
-While Go provides goroutines, channels and selects as first-class language
-support for concurrent programming, it is not trivial to combine these elements
-to address important concerns of goroutine orchestration, including error
-handling, panic recovery, goroutine leak prevention, goroutine reuse, goroutine
-throttle and logging.
+While Go provides goroutines, channels and selects as first-class citizens to
+support concurrent programming, it is not trivial to combine these elements
+to address important concerns of goroutine orchestration, e.g. error handling,
+panic recovery, goroutine leak prevention, goroutine reuse, goroutine throttle
+and logging.
 
 The package provides a mini-framework to address those cross-cutting concerns.
+
+### Design
+
+The package is built around the concept of a runner.
+
+......
 
 A group is useful when multiple concurrent sub-tasks needed to be combined as
 a single task (the task failed when one of them failed, every sub-task should be

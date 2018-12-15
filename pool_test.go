@@ -9,7 +9,7 @@ import (
 )
 
 func newTestPoolSize(t *testing.T, n int) *GoroutinePool {
-	pool := NewPool()
+	pool := NewGoroutinePool()
 	warmup(t, pool, n)
 	return pool
 }
@@ -36,7 +36,7 @@ func warmup(t *testing.T, pool *GoroutinePool, n int) *GoroutinePool {
 func TestPoolGoExactlyOnce(t *testing.T) {
 	t.Parallel()
 
-	pool := NewPool()
+	pool := NewGoroutinePool()
 	defer pool.Close()
 	n := 10
 	counts := make([]int, n)
@@ -102,7 +102,7 @@ func TestPoolGoroutineReuse(t *testing.T) {
 
 	n := 10
 
-	pool := NewPool(Max(n))
+	pool := NewGoroutinePool(Max(n))
 	defer pool.Close()
 	gidSet := make(map[uint64]bool)
 	{
@@ -207,7 +207,7 @@ func TestPoolIdleTime(t *testing.T) {
 	numBefore := runtime.NumGoroutine()
 
 	n := 10
-	pool := NewPool(IdleTime(idle), Max(n))
+	pool := NewGoroutinePool(IdleTime(idle), Max(n))
 	defer pool.Close()
 	warmup(t, pool, n)
 
@@ -255,7 +255,7 @@ func TestInvalidIdleTime(t *testing.T) {
 func TestPoolMaxSize(t *testing.T) {
 	t.Parallel()
 
-	pool := NewPool(Max(1))
+	pool := NewGoroutinePool(Max(1))
 	defer pool.Close()
 	quitChan := make(chan struct{})
 	defer close(quitChan)
