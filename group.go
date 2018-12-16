@@ -2,6 +2,7 @@ package run
 
 import (
 	"context"
+	"runtime"
 	"sync"
 )
 
@@ -12,6 +13,7 @@ type Group struct {
 	pool   GroupPool
 
 	logFunc func(info *LogInfo)
+	recover bool
 
 	wg      sync.WaitGroup
 	errOnce sync.Once
@@ -34,16 +36,19 @@ func Pool(p *GoroutinePool) GroupOption {
 	}
 }
 
+// Log specifies the logging function for a group, if not set, the LogInfo is
+// not generated
 func Log(logFunc func(info *LogInfo)) GroupOption {
 	return func(g *Group) {
 		g.logFunc = logFunc
 	}
 }
 
-// TODO:
+// Recover specifies if a panic in the runner goroutine should be recovered or
+// not, if not set, the default behavior is recovered.
 func Recover(yes bool) GroupOption {
 	return func(g *Group) {
-		// g.recoverFunc = ......
+		g.recover = yes
 	}
 }
 
@@ -51,9 +56,10 @@ func Recover(yes bool) GroupOption {
 func NewGroup(ctx context.Context, options ...GroupOption) *Group {
 	ctx, cancel := context.WithCancel(ctx)
 	g := &Group{
-		ctx:    ctx,
-		cancel: cancel,
-		pool:   dummyPool{},
+		ctx:     ctx,
+		cancel:  cancel,
+		pool:    dummyPool{},
+		recover: true,
 	}
 	for _, opt := range options {
 		opt(g)
@@ -76,8 +82,6 @@ func (g *Group) Go(runner Runner) error {
 
 	g.wg.Add(1)
 	err := g.pool.Go(g.ctx, func() {
-		defer g.wg.Done()
-
 		if g.logFunc != nil {
 			g.logFunc(&LogInfo{
 				Runner: runner,
@@ -85,22 +89,35 @@ func (g *Group) Go(runner Runner) error {
 			})
 		}
 
-		err := runner.Run(g.ctx)
-		if err != nil {
-			g.errOnce.Do(func() {
-				g.err = err
-				if g.cancel != nil {
-					g.cancel()
+		var err error
+		defer func() {
+			if g.recover {
+				if r := recover(); r != nil {
+					const size = 64 << 10
+					buf := make([]byte, size)
+					buf = buf[:runtime.Stack(buf, false)]
+					err = &PanicError{Err: r, Stack: buf}
 				}
-			})
-		}
-		if g.logFunc != nil {
-			g.logFunc(&LogInfo{
-				Runner: runner,
-				Event:  Exit,
-				Err:    err,
-			})
-		}
+			}
+			if err != nil {
+				g.errOnce.Do(func() {
+					g.err = err
+					if g.cancel != nil {
+						g.cancel()
+					}
+				})
+			}
+			if g.logFunc != nil {
+				g.logFunc(&LogInfo{
+					Runner: runner,
+					Event:  Exit,
+					Err:    err,
+				})
+			}
+			g.wg.Done()
+		}()
+
+		err = runner.Run(g.ctx)
 	})
 	if err == ErrDispatchTimeout {
 		g.wg.Done()

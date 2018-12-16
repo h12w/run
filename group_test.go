@@ -96,3 +96,18 @@ func TestGroupLog(t *testing.T) {
 		t.Fatalf("expect %s got %s", wantLog, log)
 	}
 }
+
+func TestGroupRecoverPanic(t *testing.T) {
+	t.Parallel()
+
+	group := NewGroup(context.Background(), Recover(true))
+	if err := group.Go(Func(func(context.Context) error {
+		panic("test panic")
+	})); err != nil {
+		t.Fatal(err)
+	}
+	if err := group.Wait(); err == nil {
+		t.Fatal("expect captured panic error but got nil")
+	}
+
+}

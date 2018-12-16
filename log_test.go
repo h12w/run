@@ -39,6 +39,11 @@ func TestName(t *testing.T) {
 			want: "h12.io/run.unnamedRunner",
 		},
 		{
+			name: "unnamed runner pointer",
+			r:    &unnamedRunner{},
+			want: "h12.io/run.unnamedRunner",
+		},
+		{
 			name: "runner func",
 			r:    Func(testRunnerFunc),
 			want: "h12.io/run.testRunnerFunc",

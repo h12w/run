@@ -66,6 +66,9 @@ func logName(runner interface{}) string {
 		return n.Name()
 	}
 	typ := reflect.TypeOf(runner)
+	for typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
 	if typ.Kind() == reflect.Func {
 		return runtime.FuncForPC(reflect.ValueOf(runner).Pointer()).Name()
 	}
