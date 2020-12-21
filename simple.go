@@ -5,10 +5,10 @@ import (
 	"sync"
 )
 
-// A SimpleGroup is an error group that cancels the context on error, without all those options
+// A Group is an error group that cancels the context on error, without all those options
 //
 // modified from https://golang.org/x/sync/errgroup
-type SimpleGroup struct {
+type Group struct {
 	ctx    context.Context
 	cancel func()
 	wg     sync.WaitGroup
@@ -17,26 +17,26 @@ type SimpleGroup struct {
 	err     error
 }
 
-// NewSimpleGroup creates a new GroupSimpleGroup
-func NewSimpleGroup(ctx context.Context) *SimpleGroup {
+// NewGroup creates a new GroupGroup
+func NewGroup(ctx context.Context) *Group {
 	internalCtx, cancel := context.WithCancel(ctx)
-	return &SimpleGroup{ctx: internalCtx, cancel: cancel}
+	return &Group{ctx: internalCtx, cancel: cancel}
 }
 
 // Cancel cancels the group
-func (g *SimpleGroup) Cancel() {
+func (g *Group) Cancel() {
 	g.cancel()
 }
 
 // Wait waits for all goroutines exit and returns the first returned error
-func (g *SimpleGroup) Wait() error {
+func (g *Group) Wait() error {
 	g.wg.Wait()
 	g.cancel()
 	return g.err
 }
 
 // Go runs the given runner in a goroutine
-func (g *SimpleGroup) Go(runner Runner) {
+func (g *Group) Go(runner Runner) {
 	g.wg.Add(1)
 
 	go func() {

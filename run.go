@@ -3,23 +3,11 @@ package run
 
 import (
 	"context"
-	"fmt"
 )
 
 // Runner defines the Run method to be exeucuted within a goroutine
 type Runner interface {
 	Run(context.Context) error
-}
-
-// PanicError represents recovered panic info
-type PanicError struct {
-	Err   interface{}
-	Stack []byte
-}
-
-// Error satisifies error interface
-func (e *PanicError) Error() string {
-	return fmt.Sprintf("%v\n%s", e.Err, e.Stack)
 }
 
 // The Func type is an adapter to allow the use of ordinary functions as

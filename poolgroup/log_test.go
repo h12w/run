@@ -1,4 +1,4 @@
-package run
+package poolgroup
 
 import (
 	"context"
@@ -37,22 +37,22 @@ func TestName(t *testing.T) {
 		{
 			name: "unnamed runner",
 			r:    unnamedRunner{},
-			want: "h12.io/run.unnamedRunner",
+			want: "h12.io/run/pool.unnamedRunner",
 		},
 		{
 			name: "unnamed runner pointer",
 			r:    &unnamedRunner{},
-			want: "h12.io/run.unnamedRunner",
+			want: "h12.io/run/pool.unnamedRunner",
 		},
 		{
 			name: "runner func",
 			r:    Func(testRunnerFunc),
-			want: "h12.io/run.testRunnerFunc",
+			want: "h12.io/run/pool.testRunnerFunc",
 		},
 		{
 			name: "runner func by method",
 			r:    Func(unnamedRunner{}.Run),
-			want: "h12.io/run.unnamedRunner.Run-fm",
+			want: "h12.io/run/pool.unnamedRunner.Run-fm",
 		},
 		{
 			name: "nil",
