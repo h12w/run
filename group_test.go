@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"strings"
 	"testing"
 )
 
@@ -90,10 +91,18 @@ func TestGroupLog(t *testing.T) {
 	if err := group.Wait(); err != nil {
 		t.Fatal(err)
 	}
-	wantLog := "h12.io/run.TestGroupLog.func2 starts\n" +
-		"h12.io/run.TestGroupLog.func2 exits\n"
-	if log := w.String(); log != wantLog {
-		t.Fatalf("expect %s got %s", wantLog, log)
+	wantLogs := []string{
+		"h12.io/run.TestGroupLog.func2 starts",
+		"h12.io/run.TestGroupLog.func2 exits",
+	}
+	logs := strings.Split(strings.TrimSpace(w.String()), "\n")
+	if len(logs) != len(wantLogs) {
+		t.Fatal("wrong number of log lines")
+	}
+	for i := range logs {
+		if !strings.HasSuffix(logs[i], wantLogs[i]) {
+			t.Fatalf("expect %s got %s", wantLogs[i], logs[i])
+		}
 	}
 }
 

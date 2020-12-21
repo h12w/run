@@ -59,7 +59,7 @@ func NewGroup(ctx context.Context, options ...GroupOption) *Group {
 		ctx:     ctx,
 		cancel:  cancel,
 		pool:    dummyPool{},
-		recover: true,
+		recover: false,
 	}
 	for _, opt := range options {
 		opt(g)
@@ -68,7 +68,7 @@ func NewGroup(ctx context.Context, options ...GroupOption) *Group {
 }
 
 // Go runs the given runner in the internal goroutine pool.
-// It returns nil when the goroutine is dispatched succesfully.
+// It returns nil when the goroutine is dispatched successfully.
 // It returns ErrDispatchTimeout if the context of the group is cancelled when
 // waiting for an idle goroutine to be available.
 // The first error return from a runner cancels the group, and all subsequent
@@ -100,12 +100,8 @@ func (g *Group) Go(runner Runner) error {
 				}
 			}
 			if err != nil {
-				g.errOnce.Do(func() {
-					g.err = err
-					if g.cancel != nil {
-						g.cancel()
-					}
-				})
+				g.setErrOnce(err)
+				g.cancel()
 			}
 			if g.logFunc != nil {
 				g.logFunc(&LogInfo{
@@ -125,8 +121,20 @@ func (g *Group) Go(runner Runner) error {
 	return err
 }
 
+// Cancel cancels the group
+func (g *Group) Cancel() {
+	g.cancel()
+}
+
+func (g *Group) setErrOnce(err error) {
+	g.errOnce.Do(func() {
+		g.err = err
+	})
+}
+
 // Wait waits for all goroutines exit and returns the first returned error
 func (g *Group) Wait() error {
 	g.wg.Wait()
+	g.cancel() // still cancel the context if all goroutines exit returning no errors
 	return g.err
 }

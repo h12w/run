@@ -74,7 +74,7 @@ type Runner interface {
 }
 ```
 
-A correct implementation of a runner should satisify the following conditions:
+Correct implementation of a runner should satisfy the following conditions:
 
 * blocks when the work is on going
 * returns when all work is done, an error occurred or context is cancelled
@@ -87,6 +87,6 @@ A Group is useful when multiple concurrent sub-tasks needed to be combined as
 a single task (the task failed when one of them failed, every sub-task should be
 cancelled when the task is cancelled).
 
-A Pool is useful when there are many short-lived gorotuines.
+A Pool is useful when there are many short-lived goroutines.
 
-Group can be built upon pool, not vice versa.
+A group can be built upon a pool, not vice versa.

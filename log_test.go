@@ -2,6 +2,7 @@ package run
 
 import (
 	"context"
+	"strings"
 	"testing"
 )
 
@@ -65,7 +66,7 @@ func TestName(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			name := logName(tc.r)
-			if name != tc.want {
+			if !strings.HasSuffix(name, tc.want) {
 				t.Fatalf("expect %s got %v", tc.want, name)
 			}
 		})
