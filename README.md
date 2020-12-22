@@ -16,7 +16,7 @@ The package provides a mini-framework to address those cross-cutting concerns.
 ### Quick start
 
 ```bash
-go get -u h12.io/run/poolgroup
+go get -u h12.io/run/gopoolgroup
 ```
 
 Here is an example illustrating the usage of the goroutine pool and the group.
@@ -24,18 +24,18 @@ The task is described in the "Google Search 2.0" page from [this slide](https://
 
 ```go
 // the goroutine pool
-pool := poolgroup.NewGoroutinePool(
-	poolgroup.Max(8),                // the pool contains maximum 8 goroutines
-	poolgroup.IdleTime(time.Minute), // a goroutine will stay in idle for maximum 1 minute before exiting
+pool := gopool.NewGoroutinePool(
+	gopool.Max(8),                // the pool contains maximum 8 goroutines
+	gopool.IdleTime(time.Minute), // a goroutine will stay in idle for maximum 1 minute before exiting
 )
 
 // the group
 // the goroutine pool might have longer lifespan than the group
-group := poolgroup.NewGroup(
+group := gopool.NewGroup(
 	context.Background(), // a context that can cancel the whole group
-	poolgroup.Pool(pool),       // the goroutine pool used by the group
-	poolgroup.Recover(true),    // recover from panic and returns the PanicError
-	poolgroup.Log(func(info *poolgroup.LogInfo) { // a log function for all starts/stops
+	gopool.Pool(pool),       // the goroutine pool used by the group
+	gopool.Recover(true),    // recover from panic and returns the PanicError
+	gopool.Log(func(info *gopool.LogInfo) { // a log function for all starts/stops
 		log.Print(info)
 	}),
 )

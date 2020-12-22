@@ -1,4 +1,4 @@
-package poolgroup
+package gopool
 
 import "h12.io/run"
 

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"h12.io/run/poolgroup"
+	"h12.io/run/gopool"
 )
 
 type GoogleSearch struct {
@@ -43,18 +43,18 @@ func (s *GoogleSearch) Run(ctx context.Context) error {
 
 func main() {
 	// the goroutine pool
-	pool := poolgroup.NewGoroutinePool(
-		poolgroup.Max(8),                // the pool contains maximum 8 goroutines
-		poolgroup.IdleTime(time.Minute), // a goroutine will stay in idle for maximum 1 minute before exiting
+	pool := gopool.NewGoroutinePool(
+		gopool.Max(8),                // the pool contains maximum 8 goroutines
+		gopool.IdleTime(time.Minute), // a goroutine will stay in idle for maximum 1 minute before exiting
 	)
 
 	// the run group
 	// the goroutine pool might have longer lifespan than the group
-	group := poolgroup.NewGroup(
-		context.Background(),    // a context that can cancel the whole group
-		poolgroup.Pool(pool),    // the goroutine pool used by the group
-		poolgroup.Recover(true), // recover from panic and returns the PanicError
-		poolgroup.Log(func(info *poolgroup.LogInfo) { // a log function for all starts/stops
+	group := gopool.NewGroup(
+		context.Background(), // a context that can cancel the whole group
+		gopool.Pool(pool),    // the goroutine pool used by the group
+		gopool.Recover(true), // recover from panic and returns the PanicError
+		gopool.Log(func(info *gopool.LogInfo) { // a log function for all starts/stops
 			log.Print(info)
 		}),
 	)

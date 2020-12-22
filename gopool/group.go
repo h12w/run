@@ -1,4 +1,4 @@
-package poolgroup
+package gopool
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package poolgroup
+package gopool
 
 import (
 	"bytes"
@@ -92,8 +92,8 @@ func TestGroupLog(t *testing.T) {
 		t.Fatal(err)
 	}
 	wantLogs := []string{
-		"h12.io/run/pool.TestGroupLog.func2 starts",
-		"h12.io/run/pool.TestGroupLog.func2 exits",
+		"h12.io/run/gopool.TestGroupLog.func2 starts",
+		"h12.io/run/gopool.TestGroupLog.func2 exits",
 	}
 	logs := strings.Split(strings.TrimSpace(w.String()), "\n")
 	if len(logs) != len(wantLogs) {
