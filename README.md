@@ -16,7 +16,7 @@ The package provides a mini-framework to address those cross-cutting concerns.
 ### Quick start
 
 ```bash
-go get -u h12.io/run/gopoolgroup
+go get -u h12.io/run/gopool
 ```
 
 Here is an example illustrating the usage of the goroutine pool and the group.
